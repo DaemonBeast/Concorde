@@ -1,4 +1,4 @@
-﻿namespace Concorde;
+﻿namespace Concorde.Abstractions;
 
 public readonly struct Snowflake
 {

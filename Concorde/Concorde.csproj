@@ -10,4 +10,15 @@
         <Authors>Daemon</Authors>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0-preview.5.22301.12" />
+      <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0-preview.5.22301.12" />
+      <PackageReference Include="Microsoft.Toolkit.HighPerformance" Version="7.1.2" />
+      <PackageReference Include="System.Text.Json" Version="7.0.0-preview.5.22301.12" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Concorde.Abstractions\Concorde.Abstractions.csproj" />
+    </ItemGroup>
+
 </Project>
