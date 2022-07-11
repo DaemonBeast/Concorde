@@ -1,13 +1,9 @@
-﻿using System.Buffers;
-using System.Net.WebSockets;
+﻿using System.Net.WebSockets;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Text.Json;
 using Concorde.Abstractions.Client;
-using Concorde.Abstractions.Schemas.Events;
 using Concorde.Abstractions.Schemas.Socket;
 using Concorde.Extensions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Toolkit.HighPerformance;
 using Microsoft.Toolkit.HighPerformance.Buffers;
@@ -36,6 +32,7 @@ public partial class BaseDiscordSocketClient
             Data = new IdentifyData()
             {
                 Token = this._botToken,
+                // TODO: make intents not hardcoded
                 Intents = 0b111111111111111111111,
                 Properties = new IdentifyConnectionProperties()
                 {
@@ -164,74 +161,6 @@ public partial class BaseDiscordSocketClient
     {
         await using var stream = memoryOwner.AsStream();
         
-        /*var baseMessage = await JsonSerializer.DeserializeAsync<BaseDataDiscordSocketMessage>(
-            stream,
-            cancellationToken: this._socketToken);
-        
-        if (this._socketToken.IsCancellationRequested)
-        {
-            return;
-        }
-        
-        if (baseMessage == null)
-        {
-            this._logger.LogWarning("Received invalid Discord message");
-            return;
-        }
-        
-        var opcodeId = baseMessage.Opcode;
-        var opcode = (Opcodes.Ids) opcodeId;
-        
-        if (!Opcodes.Schemas.TryGetValue(opcodeId, out var messageType))
-        {
-            var opcodeExists = Enum.IsDefined(typeof(Opcodes.Ids), opcodeId);
-
-            if (opcodeExists)
-            {
-                this._logger.LogWarning(
-                    "Received non-implemented opcode {Id} - {Opcode} ({Size} bytes)",
-                    opcodeId,
-                    opcode,
-                    memoryOwner.Length);
-            }
-            else
-            {
-                this._logger.LogWarning(
-                    "Received non-existent opcode {Id} ({Size} bytes)",
-                    opcodeId,
-                    memoryOwner.Length);
-            }
-
-            return;
-        }
-        
-        this._logger.LogInformation(
-            "Received opcode {Id} - {Opcode} ({Size} bytes)",
-            opcodeId,
-            opcode,
-            memoryOwner.Length);
-
-        BaseDataDiscordSocketMessage? message;
-        
-        if (messageType == typeof(BaseDataDiscordSocketMessage))
-        {
-            message = baseMessage;
-        }
-        else
-        {
-            stream.Position = 0;
-            
-            message = await JsonSerializer.DeserializeAsync(
-                stream,
-                messageType,
-                cancellationToken: this._socketToken) as BaseDataDiscordSocketMessage;
-
-            if (this._socketToken.IsCancellationRequested)
-            {
-                return;
-            }
-        }*/
-
         IDiscordSocketMessage? message = null;
 
         try
@@ -266,19 +195,6 @@ public partial class BaseDiscordSocketClient
             {
                 var dispatchMessage = (BaseDispatchDiscordSocketMessage) message;
                 this._lastSequenceNumber = dispatchMessage.SequenceNumber;
-
-                // stream.Position = 0;
-            
-                /*var eventMessage = await JsonSerializer.DeserializeAsync(
-                    stream,
-                    messageType,
-                    cancellationToken: this._socketToken) as BaseEventDiscordSocketMessage;
-
-                if (eventMessage == null)
-                {
-                    this._logger.LogWarning("Received invalid Discord event message");
-                    break;
-                }*/
 
                 await this.HandleDispatchAsync(dispatchMessage);
                 

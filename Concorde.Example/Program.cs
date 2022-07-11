@@ -1,5 +1,4 @@
-﻿using Concorde.Client;
-using Concorde.Extensions;
+﻿using Concorde.Extensions;
 using Concorde.Utilities;
 using DotNetEnv;
 using Microsoft.Extensions.Configuration;
