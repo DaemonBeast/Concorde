@@ -66,8 +66,7 @@ public static class Program
                     hostOptions.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.StopHost;
                 });
                 
-                services.AddConcordeClient<BaseDiscordClient>();
-                services.AddHostedService<ExampleDiscordClient>();
+                services.AddConcordeClient<ExampleDiscordClient>();
             })
             .UseSerilog((context, config) =>
             {

@@ -20,13 +20,26 @@ public partial class BaseDiscordSocketClient
                 
                 this.OnReady?.Invoke(readyEvent);
                 
-                this._eventEmitter.Emit(readyEvent);
+                await this._eventEmitter.Emit(readyEvent);
 
                 break;
             }
             case Events.Names.Resumed:
             {
                 this._logger.LogDebug("Resumed");
+
+                break;
+            }
+            case Events.Names.MessageCreate:
+            {
+                // TODO: not working. Maybe intents?
+                
+                // this._logger.LogInformation("a");
+                var messageCreateEvent = ((DispatchDiscordSocketMessage<MessageCreateEvent>) message).Data;
+                /*this._logger.LogInformation("b");
+                this._logger.LogInformation(message.ToString());
+                this._logger.LogInformation(messageCreateEvent.ToString());*/
+                await this._eventEmitter.Emit(messageCreateEvent);
 
                 break;
             }

@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using Concorde.Abstractions.Client;
+using Concorde.Abstractions.Schemas.Rest;
 using Concorde.Abstractions.Schemas.Socket;
 using Concorde.Extensions;
 using Microsoft.Extensions.Logging;
@@ -24,6 +25,63 @@ public partial class BaseDiscordSocketClient
     private const int MaxReceiveBufferSize = 8 * 1024 * 1024;   // 8 MiB
 
     private const int RetryInterval = 5;
+    
+    public async Task Send<T>(T message) where T : IDiscordSocketMessage
+    {
+        this._logger.LogTrace("Sending socket message {MessageType}", typeof(T));
+        
+        if (this._socketToken.IsCancellationRequested)
+        {
+            return;
+        }
+
+        var memoryOwner = MemoryOwner<byte>.Allocate(4096);
+        await using var stream = memoryOwner.AsStream();
+        
+        await JsonSerializer.SerializeAsync(stream, message, cancellationToken: this._socketToken);
+
+        var data = memoryOwner.Memory[..(int) stream.Position];
+
+        while (true)
+        {
+            try
+            {
+                await this.Socket!.SendAsync(data, WebSocketMessageType.Binary, true, this._socketToken);
+
+                break;
+            }
+            catch
+            {
+                if (this._socketToken.IsCancellationRequested)
+                {
+                    break;
+                }
+                
+                this._logger.LogTrace(
+                    "Socket message failed to send. Retrying after {RetryInterval} seconds",
+                    RetryInterval);
+                
+                if (message.Opcode is
+                    (int) Opcodes.Ids.Heartbeat or
+                    (int) Opcodes.Ids.Identity or
+                    (int) Opcodes.Ids.Resume)
+                {
+                    await this.ResetSocket(true);
+
+                    if (this.Socket?.State != WebSocketState.Open)
+                    {
+                        await this._socketToken.AsTask(TimeSpan.FromSeconds(RetryInterval));
+                    }
+                }
+                else
+                {
+                    await this.ResetSocketAndWait();
+                }
+            }
+        }
+
+        // await stream.DisposeAsync();
+    }
 
     public async Task SendIdentify()
     {
@@ -271,63 +329,6 @@ public partial class BaseDiscordSocketClient
         }
     }
 
-    protected async Task Send<T>(T message) where T : IDiscordSocketMessage
-    {
-        this._logger.LogTrace("Sending socket message {MessageType}", typeof(T));
-        
-        if (this._socketToken.IsCancellationRequested)
-        {
-            return;
-        }
-
-        var memoryOwner = MemoryOwner<byte>.Allocate(4096);
-        await using var stream = memoryOwner.AsStream();
-        
-        await JsonSerializer.SerializeAsync(stream, message, cancellationToken: this._socketToken);
-
-        var data = memoryOwner.Memory[..(int) stream.Position];
-
-        while (true)
-        {
-            try
-            {
-                await this.Socket!.SendAsync(data, WebSocketMessageType.Binary, true, this._socketToken);
-
-                break;
-            }
-            catch
-            {
-                if (this._socketToken.IsCancellationRequested)
-                {
-                    break;
-                }
-                
-                this._logger.LogTrace(
-                    "Socket message failed to send. Retrying after {RetryInterval} seconds",
-                    RetryInterval);
-                
-                if (message.Opcode is
-                    (int) Opcodes.Ids.Heartbeat or
-                    (int) Opcodes.Ids.Identity or
-                    (int) Opcodes.Ids.Resume)
-                {
-                    await this.ResetSocket(true);
-
-                    if (this.Socket?.State != WebSocketState.Open)
-                    {
-                        await this._socketToken.AsTask(TimeSpan.FromSeconds(RetryInterval));
-                    }
-                }
-                else
-                {
-                    await this.ResetSocketAndWait();
-                }
-            }
-        }
-
-        // await stream.DisposeAsync();
-    }
-    
     private async Task SendHeartbeat()
     {
         var heartbeat = new HeartbeatMessage()

@@ -25,15 +25,3 @@ public class BaseDispatchDiscordSocketMessage : BaseDiscordSocketMessage
     [JsonPropertyName("t")]
     public string EventName { get; set; } = null!;
 }
-
-/*public class DispatchDiscordSocketMessage<T> : DispatchDiscordSocketMessage where T : IDiscordEvent
-{
-    [JsonPropertyName("d")]
-    public new T? Data { get; set; }
-}
-
-public class DispatchDiscordSocketMessage : BaseDispatchDiscordSocketMessage
-{
-    [JsonPropertyName("d")]
-    public IDiscordEvent? Data { get; set; }
-}*/
