@@ -1,4 +1,5 @@
-﻿using Concorde.Abstractions.Client;
+﻿using Concorde.Abstractions;
+using Concorde.Abstractions.Client;
 using Concorde.Abstractions.Schemas.Events;
 using Concorde.Client;
 using Microsoft.Extensions.Logging;
@@ -10,10 +11,11 @@ public class ExampleDiscordClient : BaseDiscordClient
     private readonly ILogger<ExampleDiscordClient> _logger;
 
     public ExampleDiscordClient(
-        ILogger<ExampleDiscordClient> logger,
         IDiscordRestClient discordRestClient,
-        IDiscordSocketClient discordSocketClient)
-        : base(discordRestClient, discordSocketClient)
+        IDiscordSocketClient discordSocketClient,
+        IEventListener<IDiscordSocketClient> eventListener,
+        ILogger<ExampleDiscordClient> logger)
+        : base(discordRestClient, discordSocketClient, eventListener)
     {
         this._logger = logger;
     }

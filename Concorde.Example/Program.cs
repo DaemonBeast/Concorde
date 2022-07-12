@@ -1,4 +1,5 @@
-﻿using Concorde.Extensions;
+﻿using Concorde.Client;
+using Concorde.Extensions;
 using Concorde.Utilities;
 using DotNetEnv;
 using Microsoft.Extensions.Configuration;
@@ -65,7 +66,8 @@ public static class Program
                     hostOptions.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.StopHost;
                 });
                 
-                services.AddConcordeClient<ExampleDiscordClient>();
+                services.AddConcordeClient<BaseDiscordClient>();
+                services.AddHostedService<ExampleDiscordClient>();
             })
             .UseSerilog((context, config) =>
             {

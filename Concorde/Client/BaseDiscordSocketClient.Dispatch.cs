@@ -19,6 +19,8 @@ public partial class BaseDiscordSocketClient
                 this._logger.LogDebug("Received ready with session ID {SessionId}", readyEvent.SessionId);
                 
                 this.OnReady?.Invoke(readyEvent);
+                
+                this._eventEmitter.Emit(readyEvent);
 
                 break;
             }

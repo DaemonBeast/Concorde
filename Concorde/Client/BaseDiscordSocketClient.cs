@@ -18,6 +18,7 @@ public partial class BaseDiscordSocketClient : IDiscordSocketClient
     private readonly IConfiguration _configuration;
     private readonly IFactory<ClientWebSocket> _socketFactory;
     private readonly IDiscordRestClient _discordRestClient;
+    private readonly IEventEmitter<IDiscordSocketClient> _eventEmitter;
 
     private CancellationTokenSource _socketTokenSource;
     private CancellationToken _socketToken;
@@ -37,12 +38,14 @@ public partial class BaseDiscordSocketClient : IDiscordSocketClient
         ILogger<BaseDiscordSocketClient> logger,
         IConfiguration configuration,
         IFactory<ClientWebSocket> socketFactory,
-        IDiscordRestClient discordRestClient)
+        IDiscordRestClient discordRestClient,
+        IEventEmitter<IDiscordSocketClient> eventEmitter)
     {
         this._logger = logger;
         this._configuration = configuration;
         this._socketFactory = socketFactory;
         this._discordRestClient = discordRestClient;
+        this._eventEmitter = eventEmitter;
 
         this._socketTokenSource = new CancellationTokenSource();
         this._socketToken = this._socketTokenSource.Token;

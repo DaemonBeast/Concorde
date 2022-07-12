@@ -58,6 +58,10 @@ public static class ServiceExtensions
 
         services.AddFactory<ClientWebSocket>();
 
+        services.AddSingleton<IEventManager, EventManager>();
+        services.AddSingleton(typeof(IEventListener<>), typeof(EventListener<>));
+        services.AddSingleton(typeof(IEventEmitter<>), typeof(EventEmitter<>));
+
         services.AddSingleton<IDiscordRestClient, TRestClient>();
         services.AddSingleton<IDiscordSocketClient, TSocketClient>();
 
