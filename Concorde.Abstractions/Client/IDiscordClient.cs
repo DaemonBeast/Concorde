@@ -1,3 +1,9 @@
-﻿namespace Concorde.Abstractions.Client;
+﻿using Concorde.Abstractions.Schemas.Objects;
+using Concorde.Abstractions.Schemas.Rest;
 
-public interface IDiscordClient { }
+namespace Concorde.Abstractions.Client;
+
+public interface IDiscordClient
+{
+    public Task<Message> SendMessage(MessageCreate messageCreate, Snowflake channelId);
+}

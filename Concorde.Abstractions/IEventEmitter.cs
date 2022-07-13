@@ -2,5 +2,6 @@
 
 public interface IEventEmitter<out T> where T : class
 {
-    public Task Emit<TEvent>(TEvent ev) where TEvent : IEvent;
+    public Task Emit<TEvent>(TEvent ev)
+        where TEvent : IEvent;
 }

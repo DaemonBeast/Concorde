@@ -29,9 +29,6 @@ public class BaseDiscordClient : BackgroundService, IDiscordClient
         await this._discordRestClient.StartAsync(stoppingToken);
         await this._discordSocketClient.StartAsync(stoppingToken);
 
-        this._socketEventListener.On<ReadyEvent>(this.OnReady);
-        this._socketEventListener.On<MessageCreateEvent>(this.OnMessageCreated);
-
         await stoppingToken.AsTask();
 
         await this._discordSocketClient.StopAsync(CancellationToken.None);
@@ -41,15 +38,5 @@ public class BaseDiscordClient : BackgroundService, IDiscordClient
     public async Task<Message> SendMessage(MessageCreate messageCreate, Snowflake channelId)
     {
         return await this._discordRestClient.SendMessage(messageCreate, channelId);
-    }
-
-    protected virtual Task OnReady(ReadyEvent readyEvent)
-    {
-        return Task.CompletedTask;
-    }
-
-    protected virtual Task OnMessageCreated(MessageCreateEvent messageCreateEvent)
-    {
-        return Task.CompletedTask;
     }
 }

@@ -64,8 +64,9 @@ public static class ServiceExtensions
 
         services.AddSingleton<IDiscordRestClient, TRestClient>();
         services.AddSingleton<IDiscordSocketClient, TSocketClient>();
-
-        services.AddHostedService<TClient>();
+        
+        services.AddSingleton<IDiscordClient, TClient>();
+        services.AddHostedService(provider => (TClient) provider.GetRequiredService<IDiscordClient>());
 
         return services;
     }

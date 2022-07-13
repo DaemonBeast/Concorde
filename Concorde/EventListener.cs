@@ -2,7 +2,8 @@
 
 namespace Concorde;
 
-public class EventListener<T> : IEventListener<T> where T : class
+public class EventListener<T> : IEventListener<T>
+    where T : class
 {
     private readonly IEventManager _eventManager;
 
@@ -11,8 +12,10 @@ public class EventListener<T> : IEventListener<T> where T : class
         this._eventManager = eventManager;
     }
 
-    public void On<TEvent>(Func<TEvent, Task> eventHandler) where TEvent : IEvent
+    public void On<TEvent, THandler>()
+        where TEvent : IEvent
+        where THandler : IHandler<TEvent>
     {
-        this._eventManager.Register<T, TEvent>(eventHandler);
+        this._eventManager.Register<T, TEvent, THandler>();
     }
 }

@@ -2,7 +2,12 @@
 
 public interface IEventManager
 {
-    public void Register<T, TEvent>(Func<TEvent, Task> eventHandler) where T : class where TEvent : IEvent;
+    public void Register<T, TEvent, THandler>()
+        where T : class
+        where TEvent : IEvent
+        where THandler : IHandler<TEvent>;
 
-    public Task Emit<T, TEvent>(TEvent ev) where T : class where TEvent : IEvent;
+    public Task Emit<T, TEvent>(TEvent ev)
+        where T : class
+        where TEvent : IEvent;
 }
